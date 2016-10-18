@@ -8,24 +8,22 @@ public class person_move : MonoBehaviour {
     public int speed = 4;
 	public Text scoreText;
 	public Text levelText;
-    private bool walking = false;
-	private Animator animator;
-	private GameObject target;
-	private List<GameObject> dieItems;
-	//private GameObject[] dieItems;
-	private GameObject[] touchableItems;
 	public Button startButton;
 	public Button restartButton;
 	public Button shareButton;
+	public Text timer;
+	
+	private List<GameObject> items = new List<GameObject>();
+	private string[] tips = {"接触的物品（次数）越多得分越高", "离旗帜越近的死亡得分越高","分享录像给你的朋友看看"};
+	private bool walking = false;
+	private Animator animator;
+	private GameObject target;
 	private float startX;
 	private Rigidbody2D rb;
 	private int hit = 0;
 	private float preX;
 	private int count;
 	private int step = 700;
-	public Text timer;
-	public List<GameObject> items = new List<GameObject>();
-	private string[] tips = {"接触的物品（次数）越多得分越高", "离旗帜越近的死亡得分越高"};
 	// Use this for initialization
 	void Start () {
 		rb = (Rigidbody2D)GetComponent<Rigidbody2D> ();
@@ -56,7 +54,7 @@ public class person_move : MonoBehaviour {
 			if (step < 300) {
 				timer.text = "倒计时：" + step;
 			}
-			if (step < 0) {
+			if (step < 1) {
 				Failed (null);
 			} else {
 				step--;
@@ -84,7 +82,7 @@ public class person_move : MonoBehaviour {
 			Destroy (gb);
 		}
 		GameManager.gm.addLost ();
-		showScore ("你失败了！\n你必须杀死自己，不要碰到旗帜！");
+		showScore ("你失败了！\n你必须在限定时间内杀死自己，不要碰到旗帜！");
 		animator.SetBool ("ground", false);
 	}
 
@@ -97,11 +95,16 @@ public class person_move : MonoBehaviour {
 			if (tag.Equals ("flag")) {
 				Failed(col.gameObject);
 			}
-			if (tag.Equals ("item") || tag.Equals ("dropitem")) {
+			float speed = rb.velocity.magnitude;
+			if (tag.Equals ("item") || tag.Equals ("dropitem") || (speed > 50 && tag.Equals("background"))) {
 				if (tag.Equals ("item")) {
 					animator.SetInteger ("status", 2);
 				} else if (tag.Equals ("dropitem")) {
-					animator.SetInteger ("status", 3);
+					if(col.gameObject.GetComponent<Rigidbody2D> ().mass > 1){
+						animator.SetInteger ("status", 4);
+					}else{
+						animator.SetInteger ("status", 3);
+					}
 				}
 				float totalD = target.transform.position.x - startX;
 				float nowD = transform.position.x-startX;
@@ -158,7 +161,7 @@ public class person_move : MonoBehaviour {
 	}
 
 	public void start(){
-		step = 500;
+		step = 700;
 		setWalking (true);
 	}
 

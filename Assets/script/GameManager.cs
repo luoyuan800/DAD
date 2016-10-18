@@ -19,7 +19,8 @@ public class GameManager {
 		}
 		return win * 100 / total;
 	}
-
+	
+	[MethodImpl(MethodImplOptions.Synchronized)]
 	void load ()
 	{
 		isload = true;

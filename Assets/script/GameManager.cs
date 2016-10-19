@@ -9,6 +9,7 @@ public class GameManager {
 	private bool isload = false;
 	private int win = 0;
 	private int total = 0;
+	private bool isShowAdTip = true;
 
 	private int maxScore = 0;
 
@@ -27,14 +28,16 @@ public class GameManager {
 		win = PlayerPrefs.GetInt ("win", 0);
 		total = PlayerPrefs.GetInt ("total", 0);
 		maxScore = PlayerPrefs.GetInt ("max", 0);
+		isShowAdTip = PlayerPrefs.GetBool ("ad", ture);
 	}
 
 	void save(){
-		if (total > PlayerPrefs.GetInt ("total", 1) || maxScore > PlayerPrefs.GetInt ("max", 0)) {
+		if (total > PlayerPrefs.GetInt ("total", 1) || maxScore > PlayerPrefs.GetInt ("max", 0) || PlayerPrefs.GetBool ("ad", ture)!=isShowAdTip) {
 			PlayerPrefs.SetInt ("win", win);
 			PlayerPrefs.SetInt ("total", total);
 			PlayerPrefs.SetInt ("max", maxScore);
-		}
+			PlayerPrefs.SetBool ("ad", isShowAdTip);
+}
 	}
 
 	public int GetWin(){
@@ -68,5 +71,17 @@ public class GameManager {
 	}
 	public void addLost(){
 		total++;
+	}
+	
+	public void closeAdTip(){
+		isShowAdTip = false;
+	}
+	
+	public bool isAd(){
+		return isShowAdTip;
+	}
+	
+	public void screenshot(){
+		Application.CaptureScreenshot ("dad_" + win + ".png");
 	}
 }

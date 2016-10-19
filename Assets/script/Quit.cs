@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class Quit : MonoBehaviour {
-	public Canve exitCanve; 
+	public Canvas exitCanve; 
 	private bool press;
 	// Use this for initialization
 	void Start () {
@@ -12,17 +12,19 @@ public class Quit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey (KeyCode.Escape)) {
-			if(!press){
+			QuitGame ();
+			/*if(!press){
 				press = true;
-				exitCance.gameObject.SetActive(true);
-			}
-		}else{
-			press = false;
-			exitCance.gameObject.SetActive(false);
+				exitCanve.gameObject.SetActive(true);
+			}else{
+				press = false;
+				exitCanve.gameObject.SetActive(false);
+			}*/
 		}
 	}
 	
-	void Quit(){
+	void QuitGame(){
+		GameManager.gm.save ();
 		Application.Quit ();
 	}
 }

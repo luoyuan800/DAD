@@ -10,9 +10,9 @@ public class SharePic : MonoBehaviour
     static AndroidJavaClass sharePluginClass;
     static AndroidJavaClass unityPlayer;
     static AndroidJavaObject currActivity;
-    private static Share mInstance;
+    private static SharePic mInstance;
          
-    public static Share instance {
+    public static SharePic instance {
         get{ return mInstance;}
     }
          
@@ -34,8 +34,9 @@ public class SharePic : MonoBehaviour
         currActivity = unityPlayer.GetStatic<AndroidJavaObject> ("currentActivity");
     }
          
-    public void CallShare (string handline, string subject, string text, bool image)
+    public void CallShare (string handline, string subject, string text, string imageName, bool image)
     {
+		imagePath = Application.persistentDataPath + "/" + imageName;
         Debug.Log ("share call start : " + imagePath);
         if (image) {
             sharePluginClass.CallStatic ("share", new object[] {
@@ -75,9 +76,9 @@ public class SharePic : MonoBehaviour
              
         byte[] imagebytes = tex.EncodeToPNG ();//png
              
-        tex.Compress (false);//压缩
+        tex.Compress (false);
              
-        //      image.mainTexture = tex;//缩略图
+        //      image.mainTexture = tex;
 		 imagePath = Application.persistentDataPath + "/dad_" + GameManager.gm.GetWin() + ".png";
         File.WriteAllBytes (imagePath, imagebytes);//save
              

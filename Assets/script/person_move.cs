@@ -11,10 +11,11 @@ public class person_move : MonoBehaviour {
 	public Button startButton;
 	public Button restartButton;
 	public Button shareButton;
+	public Button nextButton;
 	public Text timer;
 	
 	private List<GameObject> items = new List<GameObject>();
-	private string[] tips = {"接触的物品（次数）越多得分越高", "离旗帜越近的死亡得分越高","分享录像给你的朋友看看"};
+	private string[] tips = {"接触的物品（次数）越多得分越高", "离旗帜越近的死亡得分越高","分享你的记录给朋友看看"};
 	private bool walking = false;
 	private Animator animator;
 	private GameObject target;
@@ -23,7 +24,7 @@ public class person_move : MonoBehaviour {
 	private int hit = 0;
 	private float preX;
 	private int count;
-	private int step = 700;
+	private int step = 500;
 	// Use this for initialization
 	void Start () {
 		rb = (Rigidbody2D)GetComponent<Rigidbody2D> ();
@@ -33,6 +34,7 @@ public class person_move : MonoBehaviour {
 		startButton.gameObject.SetActive (true);
 		restartButton.enabled = false;
 		restartButton.gameObject.SetActive (false);
+		nextButton.gameObject.SetActive (false);
 		if (items != null) {
 			items.Clear ();
 			foreach(GameObject item in Resources.LoadAll("pre")){
@@ -51,7 +53,7 @@ public class person_move : MonoBehaviour {
 	void Update () {
         if (walking)
         {
-			if (step < 300) {
+			if (step < 200) {
 				timer.text = "倒计时：" + step;
 			}
 			if (step < 1) {
@@ -68,7 +70,7 @@ public class person_move : MonoBehaviour {
 				if (count > 120) {
 					target.transform.position = Vector2.Lerp (target.transform.position, transform.position, Time.deltaTime);
 				} else {
-					target.transform.position = Vector2.Lerp (target.transform.position, transform.position, Time.deltaTime / 10);
+					target.transform.position = Vector2.Lerp (target.transform.position, transform.position, Time.deltaTime / 8);
 				}
 			}
 
@@ -128,11 +130,12 @@ public class person_move : MonoBehaviour {
 	private void showScore(string text){
 		scoreText.enabled = true;
 		scoreText.text = text;
-		restartButton.gameObject.SetActive (true);
+		//restartButton.gameObject.SetActive (true);
 		startButton.gameObject.SetActive (false);
 		shareButton.gameObject.SetActive (true);
-		restartButton.enabled = true;
+		//restartButton.enabled = true;
 		startButton.enabled = false;
+		nextButton.gameObject.SetActive (true);
 		updateLeveText ();
 	}
 
@@ -143,10 +146,13 @@ public class person_move : MonoBehaviour {
 			animator.SetInteger ("status", 1);
 			if (items!= null) {
 				foreach(GameObject item in items){
-					if(item.tag.Equals("dropitem")){
-						item.GetComponent<Rigidbody2D> ().isKinematic = false;
+					Rigidbody2D rgb = item.GetComponent<Rigidbody2D> ();
+					if(item.tag.Equals("dropitem") && rgb!=null){
+						rgb.isKinematic = false;
 					}
-					item.GetComponent<Collider2D> ().isTrigger = false;
+					if(rgb!=null){
+						item.GetComponent<Collider2D> ().isTrigger = false;
+					}
 					item.GetComponent<mouse_move_item> ().setMovable (false);
 				}
 
@@ -161,7 +167,7 @@ public class person_move : MonoBehaviour {
 	}
 
 	public void start(){
-		step = 700;
+		step = 500;
 		setWalking (true);
 	}
 
@@ -170,10 +176,18 @@ public class person_move : MonoBehaviour {
 	}
 
 	public void Share(){
-		Application.CaptureScreenshot ("dad_" + hit + ".png");
+		//SharePic.instance.ScreenShot ();
+		string file = "dad_" + GameManager.gm.GetWin() + ".png";
+		Application.CaptureScreenshot (file);
+		SharePic.instance.CallShare ("share", "", "share text and image ha ha ha ha ha ha ~", file, true);
+		//Application.CaptureScreenshot ("dad_" + hit + ".png");
 	}
 
 	private void updateLeveText(){
 		levelText.text = GameManager.gm.GetWin() + "/" + GameManager.gm.GetTotal() + "\n最高分：" + GameManager.gm.GetMaxScore();
+	}
+
+	public void play(){
+		
 	}
 }

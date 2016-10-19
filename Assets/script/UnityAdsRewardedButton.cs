@@ -4,9 +4,9 @@ using UnityEngine.Advertisements;
 
 public class UnityAdsRewardedButton : MonoBehaviour
 {
-    public string zoneId = "1172895";
+	public string zoneId = "rewardedVideo";
 	public int time;
-    private GameObject[] items;;
+    private Object[] items;
 	
 
 	void Start(){
@@ -18,7 +18,7 @@ public class UnityAdsRewardedButton : MonoBehaviour
         if (string.IsNullOrEmpty (zoneId)) zoneId = null;
 
         Rect buttonRect = new Rect (10, 10, 150, 50);
-        string buttonText = Advertisement.IsReady (zoneId) ? "Show Ad" : "Waiting...";
+		string buttonText = Advertisement.IsReady (zoneId) || Advertisement.IsReady () ? "Show Ad" : "Waiting...";
 
         ShowOptions options = new ShowOptions();
         options.resultCallback = HandleShowResult;
@@ -33,7 +33,6 @@ public class UnityAdsRewardedButton : MonoBehaviour
         switch (result)
         {
         case ShowResult.Finished:
-            Debug.Log ("Video completed. User rewarded " + rewardQty + " credits.");
 			if(time > 0){
 				foreach(GameObject item in items){
 					if(Random.Range(0,2) == 0){
@@ -48,7 +47,8 @@ public class UnityAdsRewardedButton : MonoBehaviour
             Debug.LogWarning ("Video was skipped.");
             break;
         case ShowResult.Failed:
-            Debug.LogError ("Video failed to show.");
+			
+			Debug.LogError ("Video failed to show." );
             break;
         }
     }

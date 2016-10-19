@@ -28,15 +28,15 @@ public class GameManager {
 		win = PlayerPrefs.GetInt ("win", 0);
 		total = PlayerPrefs.GetInt ("total", 0);
 		maxScore = PlayerPrefs.GetInt ("max", 0);
-		isShowAdTip = PlayerPrefs.GetBool ("ad", ture);
+		isShowAdTip = PlayerPrefs.GetInt ("ad", 1) == 1;
 	}
 
-	void save(){
-		if (total > PlayerPrefs.GetInt ("total", 1) || maxScore > PlayerPrefs.GetInt ("max", 0) || PlayerPrefs.GetBool ("ad", ture)!=isShowAdTip) {
+	public void save(){
+		if (total > PlayerPrefs.GetInt ("total", 1) || maxScore > PlayerPrefs.GetInt ("max", 0) ) {
 			PlayerPrefs.SetInt ("win", win);
 			PlayerPrefs.SetInt ("total", total);
 			PlayerPrefs.SetInt ("max", maxScore);
-			PlayerPrefs.SetBool ("ad", isShowAdTip);
+			PlayerPrefs.SetInt ("ad", isShowAdTip?1:0);
 }
 	}
 

@@ -39,7 +39,7 @@ public class person_move : MonoBehaviour {
 			items.Clear ();
 			foreach(GameObject item in Resources.LoadAll("pre")){
 				if (Random.Range (0, 2) == 0) {
-					items.Add(Instantiate (item));
+					addItem(item);
 				}
 			}
 		}
@@ -189,5 +189,11 @@ public class person_move : MonoBehaviour {
 
 	public void play(){
 		
+	}
+	
+	public GameObject addItem(GameObject item){
+		GameObject ins = Instantiate (item);
+		items.Add(ins);
+		return ins;
 	}
 }

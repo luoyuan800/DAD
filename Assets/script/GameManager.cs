@@ -2,6 +2,8 @@
 using System.Collections;
 using System;
 using System.Runtime.CompilerServices;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager {
 	public static GameManager gm = new GameManager();
@@ -10,6 +12,8 @@ public class GameManager {
 	private int win = 0;
 	private int total = 0;
 	private bool isShowAdTip = true;
+	private GameObject play;
+	private person_move perosn;
 
 	private int maxScore = 0;
 
@@ -29,6 +33,8 @@ public class GameManager {
 		total = PlayerPrefs.GetInt ("total", 0);
 		maxScore = PlayerPrefs.GetInt ("max", 0);
 		isShowAdTip = PlayerPrefs.GetInt ("ad", 1) == 1;
+		play = GameObject.Find("Play");
+		person = play.GetComponent<person_move>();
 	}
 
 	public void save(){
@@ -83,5 +89,40 @@ public class GameManager {
 	
 	public void screenshot(){
 		Application.CaptureScreenshot ("dad_" + win + ".png");
+	}
+	
+	public void record(List<GameObject> gameObjects){
+		string record = '';
+		foreach(GameObject gameObject in gameObjects){
+			record += gameObject.name + ":" + gameObject.transform.x + ":" + gameObject.transform.y + ";";
+		}
+		FileInfo file = new FileInfo(Application.persistentDataPath + "/record/" + GetWin() + ".dad");
+		StreamWriter writer = file.CreateText();
+		writer.WriteLine(record);
+		writer.Close();
+		writer.Dispose();
+	}
+	
+	public List<String> readRecords(){
+		List<string> records = new List<string>();
+		DirectoryInfo direction = new DirectoryInfo(Application.persistentDataPath + "/record/");  
+		FileInfo[] files = direction.GetFiles("*",SearchOption.AllDirectories); 
+		foreach(FileInfo file in files){
+			StreamReader reader = file.OpenText();
+			records.add(reader.ReaderLine());
+			reader.Close();
+			reader.Dispose();
+		}
+		return records;
+	}
+	
+	public void replayRecord(String record){
+		string[] strings = record.Split(":");
+		if(strings.length == 3){
+			GameObject gobject = Resources.Load(strings[0]);
+			gobject = person.addItem(gobject);
+			gobject.transform.x = strings[1] as float;
+			gobject.transform.y = strings[2] as float;
+		}
 	}
 }

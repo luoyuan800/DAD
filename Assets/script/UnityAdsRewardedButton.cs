@@ -5,12 +5,18 @@ using UnityEngine.Advertisements;
 public class UnityAdsRewardedButton : MonoBehaviour
 {
 	public string zoneId = "rewardedVideo";
+	public GameObject person;
 	public int time;
     private Object[] items;
+	private person_move personScript;
 	
 
 	void Start(){
 		items = Resources.LoadAll("pre");
+		Advertisement.Initialize("1172895", true); 
+		if(person!=null){
+			personScript = person.GetComponent<person_move>();
+		}
 	}
 	
     void OnGUI ()
@@ -18,13 +24,17 @@ public class UnityAdsRewardedButton : MonoBehaviour
         if (string.IsNullOrEmpty (zoneId)) zoneId = null;
 
         Rect buttonRect = new Rect (10, 10, 150, 50);
-		string buttonText = Advertisement.IsReady (zoneId) || Advertisement.IsReady () ? "Show Ad" : "Waiting...";
+		string buttonText = Advertisement.IsReady (zoneId) ? "Show Ad" : "Waiting...";
 
         ShowOptions options = new ShowOptions();
         options.resultCallback = HandleShowResult;
 
         if (GUI.Button (buttonRect, buttonText)) {
-            Advertisement.Show (zoneId, options);
+			if(Advertisement.IsReady (zoneId)){
+				Advertisement.Show (zoneId, options);
+			}else{
+				Advertisement.Show ();
+			}
         }
     }
 
@@ -36,7 +46,7 @@ public class UnityAdsRewardedButton : MonoBehaviour
 			if(time > 0){
 				foreach(GameObject item in items){
 					if(Random.Range(0,2) == 0){
-						Instantiate(item);
+						personScript.addItem(item);
 						return;
 					}
 				}

@@ -6,14 +6,13 @@ public class UnityAdsRewardedButton : MonoBehaviour
 {
 	public string zoneId = "rewardedVideo";
 	public GameObject person;
-	public int time;
     private Object[] items;
 	private person_move personScript;
 	
 
 	void Start(){
 		items = Resources.LoadAll("pre");
-		Advertisement.Initialize("1172895", true); 
+		Advertisement.Initialize("1172895", false); 
 		if(person!=null){
 			personScript = person.GetComponent<person_move>();
 		}
@@ -21,10 +20,8 @@ public class UnityAdsRewardedButton : MonoBehaviour
 	
     void OnGUI ()
     {
-        if (string.IsNullOrEmpty (zoneId)) zoneId = null;
-
         Rect buttonRect = new Rect (10, 10, 150, 50);
-		string buttonText = Advertisement.IsReady (zoneId) ? "Show Ad" : "Waiting...";
+		string buttonText = Advertisement.IsReady (zoneId) || Advertisement.IsReady () ? "Show Ad" : "Waiting...";
 
         ShowOptions options = new ShowOptions();
         options.resultCallback = HandleShowResult;
@@ -33,7 +30,7 @@ public class UnityAdsRewardedButton : MonoBehaviour
 			if(Advertisement.IsReady (zoneId)){
 				Advertisement.Show (zoneId, options);
 			}else{
-				Advertisement.Show ();
+				Advertisement.Show ("video", options);
 			}
         }
     }
@@ -43,15 +40,12 @@ public class UnityAdsRewardedButton : MonoBehaviour
         switch (result)
         {
         case ShowResult.Finished:
-			if(time > 0){
 				foreach(GameObject item in items){
 					if(Random.Range(0,2) == 0){
 						personScript.addItem(item);
 						return;
 					}
 				}
-				time --;
-			}
             break;
         case ShowResult.Skipped:
             Debug.LogWarning ("Video was skipped.");

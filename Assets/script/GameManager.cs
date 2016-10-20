@@ -4,6 +4,8 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.IO;
+using System.Collections.Generic;
 
 public class GameManager {
 	public static GameManager gm = new GameManager();
@@ -13,7 +15,7 @@ public class GameManager {
 	private int total = 0;
 	private bool isShowAdTip = true;
 	private GameObject play;
-	private person_move perosn;
+	private person_move person;
 
 	private int maxScore = 0;
 
@@ -33,7 +35,7 @@ public class GameManager {
 		total = PlayerPrefs.GetInt ("total", 0);
 		maxScore = PlayerPrefs.GetInt ("max", 0);
 		isShowAdTip = PlayerPrefs.GetInt ("ad", 1) == 1;
-		play = GameObject.Find("Play");
+		play = GameObject.Find("Person");
 		person = play.GetComponent<person_move>();
 	}
 
@@ -92,9 +94,9 @@ public class GameManager {
 	}
 	
 	public void record(List<GameObject> gameObjects){
-		string record = '';
+		string record = "";
 		foreach(GameObject gameObject in gameObjects){
-			record += gameObject.name + ":" + gameObject.transform.x + ":" + gameObject.transform.y + ";";
+			record += gameObject.name + ":" + gameObject.transform.position.x + ":" + gameObject.transform.position.y + ";";
 		}
 		FileInfo file = new FileInfo(Application.persistentDataPath + "/record/" + GetWin() + ".dad");
 		StreamWriter writer = file.CreateText();
@@ -109,20 +111,22 @@ public class GameManager {
 		FileInfo[] files = direction.GetFiles("*",SearchOption.AllDirectories); 
 		foreach(FileInfo file in files){
 			StreamReader reader = file.OpenText();
-			records.add(reader.ReaderLine());
+			records.Add(reader.ReadLine());
 			reader.Close();
 			reader.Dispose();
 		}
 		return records;
 	}
 	
-	public void replayRecord(String record){
-		string[] strings = record.Split(":");
-		if(strings.length == 3){
-			GameObject gobject = Resources.Load(strings[0]);
+	public void replayRecord(string record){
+		string[] strings = record.Split(':');
+		if(strings.Length == 3){
+			GameObject gobject = (GameObject)Resources.Load(strings[0]);
 			gobject = person.addItem(gobject);
-			gobject.transform.x = strings[1] as float;
-			gobject.transform.y = strings[2] as float;
+			if (gobject != null) {
+				Vector2 v2 = new Vector2 (float.Parse (strings [1]), float.Parse (strings [2]));
+				gobject.transform.position = v2;
+			}
 		}
 	}
 }

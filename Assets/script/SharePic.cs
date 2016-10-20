@@ -3,6 +3,9 @@ using System.Collections;
 using System.IO;
      
 	 //http://www.ceeger.com/forum/read.php?tid=15252
+using System;
+
+
 public class SharePic : MonoBehaviour
 {
          
@@ -23,15 +26,17 @@ public class SharePic : MonoBehaviour
          
     void Start ()
     {
-        imagePath = Application.persistentDataPath + "/HKeyGame.png";
-        sharePluginClass = new AndroidJavaClass ("com.ari.tool.UnityAndroidTool");
-        if (sharePluginClass == null) {
-            Debug.Log ("sharePluginClass is null");
-        } else {
-            Debug.Log ("sharePluginClass is not null");
-        }
-        unityPlayer = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
-        currActivity = unityPlayer.GetStatic<AndroidJavaObject> ("currentActivity");
+		if (Application.platform == RuntimePlatform.Android) {
+			imagePath = Application.persistentDataPath + "/dad.png";
+			sharePluginClass = new AndroidJavaClass ("com.ari.tool.UnityAndroidTool");
+			if (sharePluginClass == null) {
+				Debug.Log ("sharePluginClass is null");
+			} else {
+				Debug.Log ("sharePluginClass is not null");
+			}
+			unityPlayer = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+			currActivity = unityPlayer.GetStatic<AndroidJavaObject> ("currentActivity");
+		}
     }
          
     public void CallShare (string handline, string subject, string text, string imageName, bool image)
@@ -56,16 +61,17 @@ public class SharePic : MonoBehaviour
         Debug.Log ("share call end");
     }
          
-    public void ScreenShot ()
+	public void ScreenShot (string file)
     {
-        StartCoroutine (GetCapture ());
+        StartCoroutine (GetCapture (file));
     }
          
-    IEnumerator GetCapture ()
+	IEnumerator GetCapture (string file)
     {
              
-        yield return new WaitForEndOfFrame ();
-             
+		Debug.Log ("start capture path:" + Application.persistentDataPath + "/" + file);
+		yield return new WaitForEndOfFrame ();
+		try{    
         int width = Screen.width;
              
         int height = Screen.height;
@@ -79,9 +85,12 @@ public class SharePic : MonoBehaviour
         tex.Compress (false);
              
         //      image.mainTexture = tex;
-		 imagePath = Application.persistentDataPath + "/dad_" + GameManager.gm.GetWin() + ".png";
+		imagePath = Application.persistentDataPath + "/" + file;
         File.WriteAllBytes (imagePath, imagebytes);//save
+		}catch(Exception e){
+			Debug.LogError (e.Message);
+		}
              
-        Debug.Log (Application.persistentDataPath);
+        Debug.Log ("end capture path:" + Application.persistentDataPath);
     }
 }

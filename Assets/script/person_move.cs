@@ -25,6 +25,7 @@ public class person_move : MonoBehaviour {
 	private float preX;
 	private int count;
 	private int step = 500;
+	private bool isReplay = false;
 	// Use this for initialization
 	void Start () {
 		rb = (Rigidbody2D)GetComponent<Rigidbody2D> ();
@@ -83,7 +84,9 @@ public class person_move : MonoBehaviour {
 		if (gb != null) {
 			Destroy (gb);
 		}
-		GameManager.gm.addLost ();
+		if (!isReplay) {
+			GameManager.gm.addLost ();
+		}
 		showScore ("你失败了！\n你必须在限定时间内杀死自己，不要碰到旗帜！");
 		animator.SetBool ("ground", false);
 	}
@@ -100,40 +103,44 @@ public class person_move : MonoBehaviour {
 			float speed = rb.velocity.magnitude;
 			if (tag.Equals ("item") || tag.Equals ("dropitem") || (speed > 50 && tag.Equals("background"))) {
 				if (tag.Equals ("item")) {
-					animator.SetInteger ("status", 2);
+					win(2);
 				} else if (tag.Equals ("dropitem")) {
 					if(col.gameObject.GetComponent<Rigidbody2D> ().mass > 1){
-						animator.SetInteger ("status", 4);
+						win (4);
 					}else{
-						animator.SetInteger ("status", 3);
+						win(3);
 					}
 				}
-				float totalD = target.transform.position.x - startX;
-				float nowD = transform.position.x-startX;
-				setWalking (false);
-				StartCoroutine (successfuly(totalD, nowD));
-
 			}
-
+		
 		}
 	
 	}
 
+	public void win(int index){
+		animator.SetInteger ("status", index);
+		float totalD = target.transform.position.x - startX;
+		float nowD = transform.position.x-startX;
+		StartCoroutine (successfuly(totalD, nowD));}
+
 	private IEnumerator successfuly(float totalD, float nowD){
+		setWalking (false);
 		yield return new WaitForSeconds (1f);
 		string tip = tips[Random.Range (0, tips.Length)];
 		int score = (int)(nowD * 100 * hit / totalD);
-		GameManager.gm.addWin (score);
+		if (!isReplay) {
+			GameManager.gm.addWin (score);
+		}
 		showScore(("你成功死掉了！\n得分：" + score + "\n" + tip));
 	}
 
 	private void showScore(string text){
 		scoreText.enabled = true;
 		scoreText.text = text;
-		//restartButton.gameObject.SetActive (true);
+		restartButton.gameObject.SetActive (true);
 		startButton.gameObject.SetActive (false);
 		shareButton.gameObject.SetActive (true);
-		//restartButton.enabled = true;
+		restartButton.enabled = true;
 		startButton.enabled = false;
 		nextButton.gameObject.SetActive (true);
 		updateLeveText ();
@@ -178,7 +185,8 @@ public class person_move : MonoBehaviour {
 	public void Share(){
 		//SharePic.instance.ScreenShot ();
 		string file = "dad_" + GameManager.gm.GetWin() + ".png";
-		Application.CaptureScreenshot (file);
+		//Application.CaptureScreenshot (file);
+		SharePic.instance.ScreenShot (file);
 		SharePic.instance.CallShare ("share", "", "share text and image ha ha ha ha ha ha ~", file, true);
 		//Application.CaptureScreenshot ("dad_" + hit + ".png");
 	}
@@ -188,12 +196,18 @@ public class person_move : MonoBehaviour {
 	}
 
 	public void play(){
-		
+		startButton.gameObject.SetActive (false);
+		restartButton.gameObject.SetActive (false);
 	}
 	
 	public GameObject addItem(GameObject item){
-		GameObject ins = Instantiate (item);
-		items.Add(ins);
-		return ins;
+		if (items.Count < 8) {
+			GameObject ins = Instantiate (item);
+			items.Add (ins);
+			return ins;
+		} else {
+			return null;
+		}
+	
 	}
 }

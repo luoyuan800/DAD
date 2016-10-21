@@ -13,6 +13,7 @@ public class UnityAdsRewardedButton : MonoBehaviour
 	void Start(){
 		items = Resources.LoadAll("pre");
 		Advertisement.Initialize("1172895", false); 
+		person = GameObject.FindGameObjectWithTag ("Player");
 		if(person!=null){
 			personScript = person.GetComponent<person_move>();
 		}
@@ -20,7 +21,7 @@ public class UnityAdsRewardedButton : MonoBehaviour
 	
     void OnGUI ()
     {
-        Rect buttonRect = new Rect (10, 10, 150, 50);
+        Rect buttonRect = new Rect (10, 10, 200, 80);
 		string buttonText = Advertisement.IsReady (zoneId) || Advertisement.IsReady () ? "Show Ad" : "Waiting...";
 
         ShowOptions options = new ShowOptions();

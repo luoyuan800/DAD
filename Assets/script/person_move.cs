@@ -13,6 +13,7 @@ public class person_move : MonoBehaviour {
 	public Button shareButton;
 	public Button nextButton;
 	public Text timer;
+	public Canvas adTip;
 	
 	private List<GameObject> items = new List<GameObject>();
 	private string[] tips = {"接触的物品（次数）越多得分越高", "离旗帜越近的死亡得分越高","分享你的记录给朋友看看"};
@@ -28,6 +29,7 @@ public class person_move : MonoBehaviour {
 	private bool isReplay = false;
 	// Use this for initialization
 	void Start () {
+		Screen.SetResolution (1024, 600, true);
 		rb = (Rigidbody2D)GetComponent<Rigidbody2D> ();
 		target = GameObject.Find ("flag");
 		animator = GetComponent<Animator> ();
@@ -48,6 +50,9 @@ public class person_move : MonoBehaviour {
 		startX = transform.position.x;
 		shareButton.gameObject.SetActive (false);
 		updateLeveText ();
+		if (GameManager.gm.isAd() && Random.Range (0, 3) == 0) {
+			adTip.gameObject.SetActive (true);
+		}
 	}
 	
 	// Update is called once per frame
@@ -106,10 +111,12 @@ public class person_move : MonoBehaviour {
 					win(2);
 				} else if (tag.Equals ("dropitem")) {
 					if(col.gameObject.GetComponent<Rigidbody2D> ().mass > 1){
-						win (4);
+						win (2);
 					}else{
 						win(3);
 					}
+				} else if(tag.Equals("background")){
+					win(4);
 				}
 			}
 		
@@ -140,7 +147,7 @@ public class person_move : MonoBehaviour {
 		restartButton.gameObject.SetActive (true);
 		startButton.gameObject.SetActive (false);
 		shareButton.gameObject.SetActive (true);
-		restartButton.enabled = true;
+		restartButton.enabled = false;
 		startButton.enabled = false;
 		nextButton.gameObject.SetActive (true);
 		updateLeveText ();
@@ -153,14 +160,16 @@ public class person_move : MonoBehaviour {
 			animator.SetInteger ("status", 1);
 			if (items!= null) {
 				foreach(GameObject item in items){
-					Rigidbody2D rgb = item.GetComponent<Rigidbody2D> ();
-					if(item.tag.Equals("dropitem") && rgb!=null){
-						rgb.isKinematic = false;
+					if (item != null) {
+						Rigidbody2D rgb = item.GetComponent<Rigidbody2D> ();
+						if ((item.tag.Equals ("dropitem") || item.tag.Equals ("touchableandcandropitem"))&& rgb != null) {
+							rgb.isKinematic = false;
+						}
+						if (rgb != null) {
+							item.GetComponent<Collider2D> ().isTrigger = false;
+						}
+						item.GetComponent<mouse_move_item> ().setMovable (false);
 					}
-					if(rgb!=null){
-						item.GetComponent<Collider2D> ().isTrigger = false;
-					}
-					item.GetComponent<mouse_move_item> ().setMovable (false);
 				}
 
 			}
@@ -171,6 +180,10 @@ public class person_move : MonoBehaviour {
 			GetComponent<Rigidbody2D> ().isKinematic = false;
 			GetComponent<BoxCollider2D> ().isTrigger = false;
 		}
+	}
+
+	public bool isWalking(){
+		return walking;
 	}
 
 	public void start(){
